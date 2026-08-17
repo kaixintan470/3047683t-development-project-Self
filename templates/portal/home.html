@@ -1,0 +1,115 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MedAI Clinical Reasoning System</title>
+    <link rel="stylesheet" href="{% static 'portal/app.css' %}">
+</head>
+<body>
+    <main class="shell">
+        <header class="hero">
+            <div class="account-bar">
+                <span>{{ request.user.email|default:request.user.username }}</span>
+                <a class="account-link" href="{% url 'assessment_history' %}">Assessment History</a>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button class="text-button" type="submit">Log out</button>
+                </form>
+            </div>
+            <p class="eyebrow">LOCAL EVIDENCE-GROUNDED PIPELINE</p>
+            <h1>MedAI Clinical Reasoning System</h1>
+            <p>Structured interview, independent local reasoning, and explicit validation.</p>
+        </header>
+
+        <section class="demo-panel" aria-labelledby="demo-heading">
+            <div>
+                <p class="step" id="demo-heading">SYNTHETIC DEMONSTRATIONS</p>
+                <p id="demo-label" class="demo-label">No demonstration case loaded.</p>
+                <p id="demo-notice" class="demo-notice" hidden>Demonstration mode uses fixed scripted outputs for consistent presentation. No live model inference is executed.</p>
+            </div>
+            <div class="demo-controls">
+                <button type="button" id="live-mode-button" class="demo-button">Run Live Assessment</button>
+                <button type="button" class="demo-button" data-demo-id="GU01_UTI_COMPLETE">Load Demo A — Complete UTI Case</button>
+                <button type="button" class="demo-button" data-demo-id="GU02_UTI_INCOMPLETE">Load Demo B — Incomplete UTI Case</button>
+            </div>
+        </section>
+
+        <section class="card interview-card">
+            <div class="section-heading">
+                <div>
+                    <p class="step">PATIENT INTERVIEW</p>
+                    <h2 id="question">What is the main health problem you would like help with?</h2>
+                </div>
+                <span id="stage" class="badge">INTERVIEW</span>
+            </div>
+            <form id="answer-form">
+                {% csrf_token %}
+                <label id="answer-label" for="answer">Your answer</label>
+                <div id="answer-row" class="answer-row">
+                    <input id="answer" name="answer" autocomplete="off" required>
+                    <button id="pipeline-action" type="submit">Continue</button>
+                </div>
+                <p id="input-guidance" class="input-guidance">For optional medical history, allergies, and medications: enter “No” or “None” when the item does not apply. Leave it blank only when the information is unknown or has not yet been provided.</p>
+            </form>
+            <p id="message" class="message" aria-live="polite"></p>
+        </section>
+
+        <section id="assessment-summary" class="card assessment-card" hidden aria-labelledby="assessment-heading">
+            <p class="step">PATIENT-FACING RESULT</p>
+            <h2 id="assessment-heading">Assessment Summary</h2>
+            <div class="assessment-content">
+                <div>
+                    <span>Likely condition</span>
+                    <strong id="likely-condition"></strong>
+                </div>
+                <div>
+                    <span>Summary</span>
+                    <p id="assessment-text"></p>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid">
+            <article class="card">
+                <p class="step">CURRENT STATE</p>
+                <h2>Confirmed patient facts</h2>
+                <dl id="patient-state" class="facts"><dt>Status</dt><dd>Awaiting first answer</dd></dl>
+            </article>
+            <article class="card">
+                <p class="step">RETRIEVAL</p>
+                <h2>Guideline evidence</h2>
+                <div id="evidence" class="empty">Evidence appears after retrieval.</div>
+            </article>
+        </section>
+
+        <section class="grid reasoning-grid">
+            <article class="card model-card">
+                <p class="step">SLM-A</p>
+                <h2>SLM-A &mdash; Independent Reasoning</h2>
+                <div id="slm-a" class="empty">Waiting for sufficient interview facts.</div>
+            </article>
+            <article class="card model-card">
+                <p class="step">SLM-B</p>
+                <h2>SLM-B &mdash; Independent Reasoning</h2>
+                <div id="slm-b" class="empty">Waiting for sufficient interview facts.</div>
+            </article>
+        </section>
+
+        <section class="card validation-card">
+            <div>
+                <p class="step">VALIDATION</p>
+                <h2>Backend quality gate</h2>
+            </div>
+            <div class="metrics">
+                <div><span>KAS</span><strong id="kas">&mdash;</strong></div>
+                <div><span>LCS (0&ndash;3)</span><strong id="lcs">&mdash;</strong></div>
+                <div><span>DCS</span><strong id="dcs">&mdash;</strong></div>
+                <div class="decision"><span>DECISION</span><strong id="decision">PENDING</strong></div>
+            </div>
+        </section>
+    </main>
+    <script src="{% static 'portal/app.js' %}?v=15"></script>
+</body>
+</html>

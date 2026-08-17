@@ -1,0 +1,939 @@
+{
+  "dataset_name": "female_genitourinary_synthetic_v1",
+  "schema_version": "1.0",
+  "scope": "Synthetic adult female genitourinary vignettes for deterministic software testing and dissertation evaluation only.",
+  "clinical_use": false,
+  "construction": {
+    "total_cases": 20,
+    "categories": 10,
+    "cases_per_category": 2,
+    "pair_design": "one initially complete case and one initially incomplete case per category",
+    "real_patient_data": false,
+    "external_dataset": false,
+    "note": "Expected categories are evaluation reference labels, not validated clinical ground truth."
+  },
+  "website_demo_case_id": "GU02_UTI_INCOMPLETE",
+  "cases": [
+    {
+      "case_id": "GU01_UTI_COMPLETE",
+      "category_id": "uti_lower",
+      "target_category": "Lower urinary tract infection / cystitis",
+      "presentation_type": "complete",
+      "reference_guideline_key": "ukhsa_uti_women_under_65_2025",
+      "synthetic": true,
+      "initial_patient_state": {
+        "chief_complaint": "Pain when urinating with urinary frequency",
+        "symptoms": [
+          "dysuria",
+          "urinary frequency",
+          "urgency",
+          "no vaginal discharge",
+          "no fever",
+          "no flank pain"
+        ],
+        "age": 29,
+        "gender": "female",
+        "duration": "2 days",
+        "medical_history": [],
+        "allergies": [],
+        "medications": [],
+        "explicit_negations": [
+          "allergies",
+          "medications",
+          "medical_history"
+        ]
+      },
+      "expected_information_state": "initially_complete",
+      "key_missing_information": [],
+      "follow_up_reference": [],
+      "expected_evidence_topics": [
+        "dysuria",
+        "frequency",
+        "urgency",
+        "vaginal discharge as alternative GU cause",
+        "pyelonephritis red flags"
+      ],
+      "evaluation_note": "Synthetic software/evaluation vignette only; not clinical ground truth."
+    },
+    {
+      "case_id": "GU02_UTI_INCOMPLETE",
+      "category_id": "uti_lower",
+      "target_category": "Lower urinary tract infection / cystitis",
+      "presentation_type": "initially_incomplete",
+      "reference_guideline_key": "ukhsa_uti_women_under_65_2025",
+      "synthetic": true,
+      "initial_patient_state": {
+        "chief_complaint": "Burning when passing urine",
+        "symptoms": [
+          "dysuria",
+          "urinary frequency"
+        ],
+        "age": 27,
+        "gender": "female",
+        "duration": "2 days",
+        "medical_history": [],
+        "allergies": [],
+        "medications": [],
+        "explicit_negations": [
+          "allergies",
+          "medications",
+          "medical_history"
+        ]
+      },
+      "expected_information_state": "follow_up_expected",
+      "key_missing_information": [
+        "vaginal discharge",
+        "fever",
+        "flank pain"
+      ],
+      "follow_up_reference": [
+        {
+          "topic": "vaginal discharge",
+          "answer": "No vaginal discharge."
+        },
+        {
+          "topic": "fever",
+          "answer": "No fever or chills."
+        },
+        {
+          "topic": "flank pain",
+          "answer": "No flank or back pain."
+        }
+      ],
+      "expected_evidence_topics": [
+        "dysuria",
+        "frequency",
+        "exclude vaginal causes",
+        "exclude pyelonephritis"
+      ],
+      "evaluation_note": "Synthetic software/evaluation vignette only; not clinical ground truth."
+    },
+    {
+      "case_id": "GU03_GONORRHOEA_COMPLETE",
+      "category_id": "gonorrhoea",
+      "target_category": "Gonorrhoea",
+      "presentation_type": "complete",
+      "reference_guideline_key": "bashh_gonorrhoea_2025",
+      "synthetic": true,
+      "initial_patient_state": {
+        "chief_complaint": "New vaginal discharge and painful urination",
+        "symptoms": [
+          "increased vaginal discharge",
+          "dysuria",
+          "new sexual partner",
+          "no urinary frequency",
+          "no severe pelvic pain"
+        ],
+        "age": 23,
+        "gender": "female",
+        "duration": "5 days",
+        "medical_history": [],
+        "allergies": [],
+        "medications": [],
+        "explicit_negations": [
+          "allergies",
+          "medications",
+          "medical_history"
+        ]
+      },
+      "expected_information_state": "initially_complete",
+      "key_missing_information": [],
+      "follow_up_reference": [],
+      "expected_evidence_topics": [
+        "female urethral infection",
+        "endocervical discharge",
+        "dysuria",
+        "STI differential"
+      ],
+      "evaluation_note": "Synthetic software/evaluation vignette only; not clinical ground truth."
+    },
+    {
+      "case_id": "GU04_GONORRHOEA_INCOMPLETE",
+      "category_id": "gonorrhoea",
+      "target_category": "Gonorrhoea",
+      "presentation_type": "initially_incomplete",
+      "reference_guideline_key": "bashh_gonorrhoea_2025",
+      "synthetic": true,
+      "initial_patient_state": {
+        "chief_complaint": "Changed vaginal discharge",
+        "symptoms": [
+          "increased vaginal discharge"
+        ],
+        "age": 24,
+        "gender": "female",
+        "duration": "1 week",
+        "medical_history": [],
+        "allergies": [],
+        "medications": [],
+        "explicit_negations": [
+          "allergies",
+          "medications",
+          "medical_history"
+        ]
+      },
+      "expected_information_state": "follow_up_expected",
+      "key_missing_information": [
+        "dysuria",
+        "sexual exposure history",
+        "lower abdominal pain"
+      ],
+      "follow_up_reference": [
+        {
+          "topic": "dysuria",
+          "answer": "There is burning when passing urine."
+        },
+        {
+          "topic": "sexual exposure history",
+          "answer": "There was a new sexual partner recently."
+        },
+        {
+          "topic": "lower abdominal pain",
+          "answer": "No lower abdominal pain."
+        }
+      ],
+      "expected_evidence_topics": [
+        "endocervical infection",
+        "urethral symptoms",
+        "co-infection consideration"
+      ],
+      "evaluation_note": "Synthetic software/evaluation vignette only; not clinical ground truth."
+    },
+    {
+      "case_id": "GU05_CHLAMYDIA_COMPLETE",
+      "category_id": "chlamydia",
+      "target_category": "Chlamydia",
+      "presentation_type": "complete",
+      "reference_guideline_key": "iusti_chlamydia_2025",
+      "synthetic": true,
+      "initial_patient_state": {
+        "chief_complaint": "Bleeding after sex with altered vaginal discharge",
+        "symptoms": [
+          "post-coital bleeding",
+          "increased vaginal discharge",
+          "mild dysuria",
+          "no fever",
+          "no severe pelvic pain"
+        ],
+        "age": 25,
+        "gender": "female",
+        "duration": "2 weeks",
+        "medical_history": [],
+        "allergies": [],
+        "medications": [],
+        "explicit_negations": [
+          "allergies",
+          "medications",
+          "medical_history"
+        ]
+      },
+      "expected_information_state": "initially_complete",
+      "key_missing_information": [],
+      "follow_up_reference": [],
+      "expected_evidence_topics": [
+        "cervicitis",
+        "post-coital bleeding",
+        "vaginal discharge",
+        "dysuria"
+      ],
+      "evaluation_note": "Synthetic software/evaluation vignette only; not clinical ground truth."
+    },
+    {
+      "case_id": "GU06_CHLAMYDIA_INCOMPLETE",
+      "category_id": "chlamydia",
+      "target_category": "Chlamydia",
+      "presentation_type": "initially_incomplete",
+      "reference_guideline_key": "iusti_chlamydia_2025",
+      "synthetic": true,
+      "initial_patient_state": {
+        "chief_complaint": "Mild urinary burning and unusual discharge",
+        "symptoms": [
+          "mild dysuria",
+          "altered vaginal discharge"
+        ],
+        "age": 22,
+        "gender": "female",
+        "duration": "10 days",
+        "medical_history": [],
+        "allergies": [],
+        "medications": [],
+        "explicit_negations": [
+          "allergies",
+          "medications",
+          "medical_history"
+        ]
+      },
+      "expected_information_state": "follow_up_expected",
+      "key_missing_information": [
+        "intermenstrual or post-coital bleeding",
+        "pelvic pain",
+        "deep dyspareunia"
+      ],
+      "follow_up_reference": [
+        {
+          "topic": "bleeding",
+          "answer": "There has been light bleeding after sex."
+        },
+        {
+          "topic": "pelvic pain",
+          "answer": "No significant lower abdominal pain."
+        },
+        {
+          "topic": "deep dyspareunia",
+          "answer": "No deep pain during sex."
+        }
+      ],
+      "expected_evidence_topics": [
+        "chlamydial cervicitis",
+        "bleeding",
+        "dysuria",
+        "PID differentiation"
+      ],
+      "evaluation_note": "Synthetic software/evaluation vignette only; not clinical ground truth."
+    },
+    {
+      "case_id": "GU07_PID_COMPLETE",
+      "category_id": "pid",
+      "target_category": "Pelvic inflammatory disease",
+      "presentation_type": "complete",
+      "reference_guideline_key": "bashh_pid_2019",
+      "synthetic": true,
+      "initial_patient_state": {
+        "chief_complaint": "Bilateral lower abdominal pain with abnormal discharge",
+        "symptoms": [
+          "bilateral lower abdominal pain",
+          "deep dyspareunia",
+          "abnormal vaginal discharge",
+          "intermenstrual bleeding",
+          "fever"
+        ],
+        "age": 26,
+        "gender": "female",
+        "duration": "4 days",
+        "medical_history": [],
+        "allergies": [],
+        "medications": [],
+        "explicit_negations": [
+          "allergies",
+          "medications"
+        ]
+      },
+      "expected_information_state": "initially_complete",
+      "key_missing_information": [],
+      "follow_up_reference": [],
+      "expected_evidence_topics": [
+        "bilateral lower abdominal pain",
+        "deep dyspareunia",
+        "abnormal bleeding",
+        "discharge",
+        "fever",
+        "PID differential"
+      ],
+      "evaluation_note": "Synthetic software/evaluation vignette only; not clinical ground truth."
+    },
+    {
+      "case_id": "GU08_PID_INCOMPLETE",
+      "category_id": "pid",
+      "target_category": "Pelvic inflammatory disease",
+      "presentation_type": "initially_incomplete",
+      "reference_guideline_key": "bashh_pid_2019",
+      "synthetic": true,
+      "initial_patient_state": {
+        "chief_complaint": "Lower abdominal pain",
+        "symptoms": [
+          "lower abdominal pain"
+        ],
+        "age": 24,
+        "gender": "female",
+        "duration": "3 days",
+        "medical_history": [],
+        "allergies": [],
+        "medications": [],
+        "explicit_negations": [
+          "allergies",
+          "medications",
+          "medical_history"
+        ]
+      },
+      "expected_information_state": "follow_up_expected",
+      "key_missing_information": [
+        "pain laterality",
+        "deep dyspareunia",
+        "abnormal discharge or bleeding",
+        "pregnancy possibility"
+      ],
+      "follow_up_reference": [
+        {
+          "topic": "pain laterality",
+          "answer": "The pain is on both sides of the lower abdomen."
+        },
+        {
+          "topic": "deep dyspareunia",
+          "answer": "There is deep pain during sex."
+        },
+        {
+          "topic": "abnormal discharge or bleeding",
+          "answer": "There is new abnormal vaginal discharge."
+        },
+        {
+          "topic": "pregnancy possibility",
+          "answer": "Pregnancy is not expected, but no test has been done yet."
+        }
+      ],
+      "expected_evidence_topics": [
+        "PID clinical features",
+        "pregnancy exclusion",
+        "differential diagnosis of lower abdominal pain"
+      ],
+      "evaluation_note": "Synthetic software/evaluation vignette only; not clinical ground truth."
+    },
+    {
+      "case_id": "GU09_BV_COMPLETE",
+      "category_id": "bacterial_vaginosis",
+      "target_category": "Bacterial vaginosis",
+      "presentation_type": "complete",
+      "reference_guideline_key": "bashh_bacterial_vaginosis_2012",
+      "synthetic": true,
+      "initial_patient_state": {
+        "chief_complaint": "Thin vaginal discharge with a fishy smell",
+        "symptoms": [
+          "thin white vaginal discharge",
+          "fishy vaginal odour",
+          "no vulval itching",
+          "no vulval soreness"
+        ],
+        "age": 31,
+        "gender": "female",
+        "duration": "1 week",
+        "medical_history": [],
+        "allergies": [],
+        "medications": [],
+        "explicit_negations": [
+          "allergies",
+          "medications",
+          "medical_history"
+        ]
+      },
+      "expected_information_state": "initially_complete",
+      "key_missing_information": [],
+      "follow_up_reference": [],
+      "expected_evidence_topics": [
+        "thin homogeneous discharge",
+        "fishy odour",
+        "absence of soreness or itching"
+      ],
+      "evaluation_note": "Synthetic software/evaluation vignette only; not clinical ground truth."
+    },
+    {
+      "case_id": "GU10_BV_INCOMPLETE",
+      "category_id": "bacterial_vaginosis",
+      "target_category": "Bacterial vaginosis",
+      "presentation_type": "initially_incomplete",
+      "reference_guideline_key": "bashh_bacterial_vaginosis_2012",
+      "synthetic": true,
+      "initial_patient_state": {
+        "chief_complaint": "New vaginal discharge",
+        "symptoms": [
+          "thin vaginal discharge"
+        ],
+        "age": 34,
+        "gender": "female",
+        "duration": "6 days",
+        "medical_history": [],
+        "allergies": [],
+        "medications": [],
+        "explicit_negations": [
+          "allergies",
+          "medications",
+          "medical_history"
+        ]
+      },
+      "expected_information_state": "follow_up_expected",
+      "key_missing_information": [
+        "odour",
+        "itching",
+        "soreness"
+      ],
+      "follow_up_reference": [
+        {
+          "topic": "odour",
+          "answer": "The discharge has a noticeable fishy smell."
+        },
+        {
+          "topic": "itching",
+          "answer": "No itching."
+        },
+        {
+          "topic": "soreness",
+          "answer": "No soreness or irritation."
+        }
+      ],
+      "expected_evidence_topics": [
+        "BV discharge pattern",
+        "fishy odour",
+        "differentiation from inflammatory vaginitis"
+      ],
+      "evaluation_note": "Synthetic software/evaluation vignette only; not clinical ground truth."
+    },
+    {
+      "case_id": "GU11_VVC_COMPLETE",
+      "category_id": "vvc",
+      "target_category": "Vulvovaginal candidiasis",
+      "presentation_type": "complete",
+      "reference_guideline_key": "bashh_vvc_2019",
+      "synthetic": true,
+      "initial_patient_state": {
+        "chief_complaint": "Severe vulval itching with thick white discharge",
+        "symptoms": [
+          "vulval itching",
+          "vulval soreness",
+          "thick white vaginal discharge",
+          "no fishy odour",
+          "no fever"
+        ],
+        "age": 30,
+        "gender": "female",
+        "duration": "4 days",
+        "medical_history": [
+          "recent antibiotic course"
+        ],
+        "allergies": [],
+        "medications": [],
+        "explicit_negations": [
+          "allergies",
+          "medications"
+        ]
+      },
+      "expected_information_state": "initially_complete",
+      "key_missing_information": [],
+      "follow_up_reference": [],
+      "expected_evidence_topics": [
+        "vulval pruritus",
+        "soreness",
+        "vaginal discharge",
+        "vaginitis differential"
+      ],
+      "evaluation_note": "Synthetic software/evaluation vignette only; not clinical ground truth."
+    },
+    {
+      "case_id": "GU12_VVC_INCOMPLETE",
+      "category_id": "vvc",
+      "target_category": "Vulvovaginal candidiasis",
+      "presentation_type": "initially_incomplete",
+      "reference_guideline_key": "bashh_vvc_2019",
+      "synthetic": true,
+      "initial_patient_state": {
+        "chief_complaint": "Vulval irritation",
+        "symptoms": [
+          "vulval itching",
+          "vulval irritation"
+        ],
+        "age": 28,
+        "gender": "female",
+        "duration": "3 days",
+        "medical_history": [],
+        "allergies": [],
+        "medications": [],
+        "explicit_negations": [
+          "allergies",
+          "medications",
+          "medical_history"
+        ]
+      },
+      "expected_information_state": "follow_up_expected",
+      "key_missing_information": [
+        "character of vaginal discharge",
+        "odour",
+        "dysuria"
+      ],
+      "follow_up_reference": [
+        {
+          "topic": "vaginal discharge",
+          "answer": "There is thick white vaginal discharge."
+        },
+        {
+          "topic": "odour",
+          "answer": "There is no strong or fishy smell."
+        },
+        {
+          "topic": "dysuria",
+          "answer": "Urine stings when it touches the irritated skin."
+        }
+      ],
+      "expected_evidence_topics": [
+        "candidiasis symptoms",
+        "discharge character",
+        "BV/trichomonas differentiation"
+      ],
+      "evaluation_note": "Synthetic software/evaluation vignette only; not clinical ground truth."
+    },
+    {
+      "case_id": "GU13_TRICHOMONAS_COMPLETE",
+      "category_id": "trichomonas",
+      "target_category": "Trichomonas vaginalis infection",
+      "presentation_type": "complete",
+      "reference_guideline_key": "bashh_trichomonas_2021",
+      "synthetic": true,
+      "initial_patient_state": {
+        "chief_complaint": "Increased vaginal discharge with irritation and urinary burning",
+        "symptoms": [
+          "increased vaginal discharge",
+          "unpleasant vaginal smell",
+          "vulval itching",
+          "vulval soreness",
+          "dysuria",
+          "pain during sex"
+        ],
+        "age": 32,
+        "gender": "female",
+        "duration": "8 days",
+        "medical_history": [],
+        "allergies": [],
+        "medications": [],
+        "explicit_negations": [
+          "allergies",
+          "medications",
+          "medical_history"
+        ]
+      },
+      "expected_information_state": "initially_complete",
+      "key_missing_information": [],
+      "follow_up_reference": [],
+      "expected_evidence_topics": [
+        "increased discharge",
+        "vaginal odour",
+        "dysuria",
+        "vulval irritation",
+        "dyspareunia"
+      ],
+      "evaluation_note": "Synthetic software/evaluation vignette only; not clinical ground truth."
+    },
+    {
+      "case_id": "GU14_TRICHOMONAS_INCOMPLETE",
+      "category_id": "trichomonas",
+      "target_category": "Trichomonas vaginalis infection",
+      "presentation_type": "initially_incomplete",
+      "reference_guideline_key": "bashh_trichomonas_2021",
+      "synthetic": true,
+      "initial_patient_state": {
+        "chief_complaint": "Unusual vaginal discharge",
+        "symptoms": [
+          "increased vaginal discharge"
+        ],
+        "age": 35,
+        "gender": "female",
+        "duration": "1 week",
+        "medical_history": [],
+        "allergies": [],
+        "medications": [],
+        "explicit_negations": [
+          "allergies",
+          "medications",
+          "medical_history"
+        ]
+      },
+      "expected_information_state": "follow_up_expected",
+      "key_missing_information": [
+        "vaginal odour",
+        "vulval itching or soreness",
+        "dysuria"
+      ],
+      "follow_up_reference": [
+        {
+          "topic": "vaginal odour",
+          "answer": "There is an unpleasant smell."
+        },
+        {
+          "topic": "vulval symptoms",
+          "answer": "There is itching and soreness."
+        },
+        {
+          "topic": "dysuria",
+          "answer": "There is burning when passing urine."
+        }
+      ],
+      "expected_evidence_topics": [
+        "trichomonas symptoms",
+        "vaginal discharge",
+        "urinary burning",
+        "vulval irritation"
+      ],
+      "evaluation_note": "Synthetic software/evaluation vignette only; not clinical ground truth."
+    },
+    {
+      "case_id": "GU15_MGEN_COMPLETE",
+      "category_id": "mycoplasma_genitalium",
+      "target_category": "Mycoplasma genitalium infection",
+      "presentation_type": "complete",
+      "reference_guideline_key": "bashh_mycoplasma_genitalium_2025",
+      "synthetic": true,
+      "initial_patient_state": {
+        "chief_complaint": "Persistent cervicitis-type symptoms after previous STI testing",
+        "symptoms": [
+          "persistent altered vaginal discharge",
+          "post-coital bleeding",
+          "mild pelvic discomfort",
+          "previous chlamydia and gonorrhoea tests negative"
+        ],
+        "age": 27,
+        "gender": "female",
+        "duration": "3 weeks",
+        "medical_history": [],
+        "allergies": [],
+        "medications": [],
+        "explicit_negations": [
+          "allergies",
+          "medications",
+          "medical_history"
+        ]
+      },
+      "expected_information_state": "initially_complete",
+      "key_missing_information": [],
+      "follow_up_reference": [],
+      "expected_evidence_topics": [
+        "M. genitalium urethritis/cervicitis",
+        "persistent symptoms",
+        "PID association",
+        "STI differential"
+      ],
+      "evaluation_note": "Synthetic software/evaluation vignette only; not clinical ground truth."
+    },
+    {
+      "case_id": "GU16_MGEN_INCOMPLETE",
+      "category_id": "mycoplasma_genitalium",
+      "target_category": "Mycoplasma genitalium infection",
+      "presentation_type": "initially_incomplete",
+      "reference_guideline_key": "bashh_mycoplasma_genitalium_2025",
+      "synthetic": true,
+      "initial_patient_state": {
+        "chief_complaint": "Persistent genital and urinary symptoms",
+        "symptoms": [
+          "persistent mild dysuria",
+          "altered vaginal discharge"
+        ],
+        "age": 29,
+        "gender": "female",
+        "duration": "3 weeks",
+        "medical_history": [],
+        "allergies": [],
+        "medications": [],
+        "explicit_negations": [
+          "allergies",
+          "medications",
+          "medical_history"
+        ]
+      },
+      "expected_information_state": "follow_up_expected",
+      "key_missing_information": [
+        "duration/persistence context",
+        "previous STI test results",
+        "pelvic pain or bleeding"
+      ],
+      "follow_up_reference": [
+        {
+          "topic": "persistence",
+          "answer": "Symptoms have continued for about three weeks."
+        },
+        {
+          "topic": "previous STI tests",
+          "answer": "Recent chlamydia and gonorrhoea tests were negative."
+        },
+        {
+          "topic": "pelvic pain or bleeding",
+          "answer": "There is occasional post-coital bleeding but no severe pelvic pain."
+        }
+      ],
+      "expected_evidence_topics": [
+        "persistent urethritis/cervicitis",
+        "M. genitalium testing context",
+        "PID association"
+      ],
+      "evaluation_note": "Synthetic software/evaluation vignette only; not clinical ground truth."
+    },
+    {
+      "case_id": "GU17_HERPES_COMPLETE",
+      "category_id": "anogenital_herpes",
+      "target_category": "Anogenital herpes",
+      "presentation_type": "complete",
+      "reference_guideline_key": "bashh_anogenital_herpes_2024",
+      "synthetic": true,
+      "initial_patient_state": {
+        "chief_complaint": "Painful genital sores with burning urination",
+        "symptoms": [
+          "painful grouped genital blisters",
+          "genital ulcers",
+          "dysuria",
+          "local tenderness",
+          "no abnormal vaginal discharge"
+        ],
+        "age": 26,
+        "gender": "female",
+        "duration": "3 days",
+        "medical_history": [],
+        "allergies": [],
+        "medications": [],
+        "explicit_negations": [
+          "allergies",
+          "medications",
+          "medical_history"
+        ]
+      },
+      "expected_information_state": "initially_complete",
+      "key_missing_information": [],
+      "follow_up_reference": [],
+      "expected_evidence_topics": [
+        "anogenital ulceration",
+        "painful vesicular lesions",
+        "dysuria",
+        "genital ulcer differential"
+      ],
+      "evaluation_note": "Synthetic software/evaluation vignette only; not clinical ground truth."
+    },
+    {
+      "case_id": "GU18_HERPES_INCOMPLETE",
+      "category_id": "anogenital_herpes",
+      "target_category": "Anogenital herpes",
+      "presentation_type": "initially_incomplete",
+      "reference_guideline_key": "bashh_anogenital_herpes_2024",
+      "synthetic": true,
+      "initial_patient_state": {
+        "chief_complaint": "Pain and soreness around the vulva",
+        "symptoms": [
+          "vulval pain",
+          "vulval soreness"
+        ],
+        "age": 33,
+        "gender": "female",
+        "duration": "2 days",
+        "medical_history": [],
+        "allergies": [],
+        "medications": [],
+        "explicit_negations": [
+          "allergies",
+          "medications",
+          "medical_history"
+        ]
+      },
+      "expected_information_state": "follow_up_expected",
+      "key_missing_information": [
+        "presence and character of lesions",
+        "dysuria",
+        "vaginal discharge"
+      ],
+      "follow_up_reference": [
+        {
+          "topic": "lesions",
+          "answer": "Small painful blisters appeared and some have become shallow ulcers."
+        },
+        {
+          "topic": "dysuria",
+          "answer": "Passing urine is painful."
+        },
+        {
+          "topic": "vaginal discharge",
+          "answer": "No unusual vaginal discharge."
+        }
+      ],
+      "expected_evidence_topics": [
+        "anogenital herpes lesions",
+        "dysuria",
+        "genital ulcer differential"
+      ],
+      "evaluation_note": "Synthetic software/evaluation vignette only; not clinical ground truth."
+    },
+    {
+      "case_id": "GU19_PYELO_COMPLETE",
+      "category_id": "pyelonephritis",
+      "target_category": "Upper urinary tract infection / pyelonephritis",
+      "presentation_type": "complete",
+      "reference_guideline_key": "eau_urological_infections_2026",
+      "synthetic": true,
+      "initial_patient_state": {
+        "chief_complaint": "Urinary symptoms with fever and flank pain",
+        "symptoms": [
+          "dysuria",
+          "urinary frequency",
+          "fever",
+          "shaking chills",
+          "flank pain",
+          "nausea"
+        ],
+        "age": 38,
+        "gender": "female",
+        "duration": "2 days",
+        "medical_history": [],
+        "allergies": [],
+        "medications": [],
+        "explicit_negations": [
+          "allergies",
+          "medications",
+          "medical_history"
+        ]
+      },
+      "expected_information_state": "initially_complete",
+      "key_missing_information": [],
+      "follow_up_reference": [],
+      "expected_evidence_topics": [
+        "pyelonephritis red flags",
+        "fever",
+        "flank pain",
+        "nausea",
+        "lower urinary symptoms"
+      ],
+      "evaluation_note": "Synthetic software/evaluation vignette only; not clinical ground truth."
+    },
+    {
+      "case_id": "GU20_PYELO_INCOMPLETE",
+      "category_id": "pyelonephritis",
+      "target_category": "Upper urinary tract infection / pyelonephritis",
+      "presentation_type": "initially_incomplete",
+      "reference_guideline_key": "eau_urological_infections_2026",
+      "synthetic": true,
+      "initial_patient_state": {
+        "chief_complaint": "Painful urination and feeling unwell",
+        "symptoms": [
+          "dysuria",
+          "urinary frequency",
+          "feeling unwell"
+        ],
+        "age": 41,
+        "gender": "female",
+        "duration": "2 days",
+        "medical_history": [],
+        "allergies": [],
+        "medications": [],
+        "explicit_negations": [
+          "allergies",
+          "medications",
+          "medical_history"
+        ]
+      },
+      "expected_information_state": "follow_up_expected",
+      "key_missing_information": [
+        "fever or rigors",
+        "flank/back pain",
+        "nausea or vomiting"
+      ],
+      "follow_up_reference": [
+        {
+          "topic": "fever or rigors",
+          "answer": "There is fever with shaking chills."
+        },
+        {
+          "topic": "flank pain",
+          "answer": "There is pain in the right flank under the ribs."
+        },
+        {
+          "topic": "nausea or vomiting",
+          "answer": "There is nausea but no vomiting."
+        }
+      ],
+      "expected_evidence_topics": [
+        "upper UTI",
+        "pyelonephritis symptoms",
+        "systemic features",
+        "flank pain"
+      ],
+      "evaluation_note": "Synthetic software/evaluation vignette only; not clinical ground truth."
+    }
+  ]
+}

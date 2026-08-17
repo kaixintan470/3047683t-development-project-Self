@@ -1,0 +1,254 @@
+{
+  "demo_mode": "scripted_presentation",
+  "notice": "Demonstration mode uses fixed scripted outputs for consistent presentation. No live model inference is executed.",
+  "demo_a": {
+    "case_id": "GU01_UTI_COMPLETE",
+    "label": "Demo A — Complete UTI Case",
+    "initial": {
+      "presentation_stage": "initial",
+      "status": "DEMO_LOADED",
+      "stage": "DEMO LOADED",
+      "main_action": "Run real pipeline",
+      "patient": {
+        "chief_complaint": "Burning pain when urinating with increased urinary frequency",
+        "symptoms": [
+          "dysuria",
+          "urinary frequency",
+          "urinary urgency",
+          "mild lower abdominal discomfort",
+          "no fever",
+          "no flank or back pain",
+          "no vaginal discharge",
+          "no vaginal irritation",
+          "no visible blood in urine",
+          "no nausea or vomiting"
+        ],
+        "age": 29,
+        "gender": "female",
+        "duration": "2 days",
+        "medical_history": [
+          "No known chronic medical conditions.",
+          "No previous kidney disease.",
+          "No diabetes.",
+          "No known recurrent urinary tract infections."
+        ],
+        "allergies": ["None known.", "No known medication allergies."],
+        "medications": [
+          "None.",
+          "Not currently taking regular prescription or over-the-counter medication."
+        ],
+        "explicit_negations": [],
+        "follow_up_answers": {}
+      }
+    },
+    "final": {
+      "presentation_stage": "final",
+      "status": "APPROVED",
+      "stage": "SCRIPTED FINAL",
+      "patient": {
+        "chief_complaint": "Burning pain when urinating with increased urinary frequency",
+        "symptoms": [
+          "dysuria",
+          "urinary frequency",
+          "urinary urgency",
+          "mild lower abdominal discomfort",
+          "no fever",
+          "no flank or back pain",
+          "no vaginal discharge",
+          "no vaginal irritation",
+          "no visible blood in urine",
+          "no nausea or vomiting"
+        ],
+        "age": 29,
+        "gender": "female",
+        "duration": "2 days",
+        "medical_history": [
+          "No known chronic medical conditions.",
+          "No previous kidney disease.",
+          "No diabetes.",
+          "No known recurrent urinary tract infections."
+        ],
+        "allergies": ["None known.", "No known medication allergies."],
+        "medications": [
+          "None.",
+          "Not currently taking regular prescription or over-the-counter medication."
+        ],
+        "explicit_negations": [],
+        "follow_up_answers": {}
+      },
+      "assessment_summary": {
+        "likely_condition": "Lower urinary tract infection (cystitis)",
+        "summary": "Scripted presentation: the lower urinary symptoms, short duration, and recorded absence of vaginal symptoms, fever, and flank pain are consistent with a lower urinary tract infection presentation."
+      },
+      "evidence": [
+        {
+          "source": "EAU — Urological Infections (2026)",
+          "support": "Scripted guideline-evidence presentation: focused lower urinary tract symptoms together with absence of vaginal discharge support a cystitis presentation."
+        },
+        {
+          "source": "UKHSA — UTI in women under 65 (2025)",
+          "support": "Scripted guideline-evidence presentation: absence of fever and flank or back pain does not suggest an upper urinary tract presentation."
+        }
+      ],
+      "slm_a": {
+        "model": "SLM-A scripted presentation",
+        "status": "DIAGNOSTIC_OUTPUT",
+        "sufficiency": "SUFFICIENT (SCRIPTED)",
+        "reasoning": "The recorded dysuria, frequency, urgency, and short duration form a coherent lower urinary symptom pattern. The scripted record also confirms no vaginal discharge, fever, or flank pain."
+      },
+      "slm_b": {
+        "model": "SLM-B scripted presentation",
+        "status": "DIAGNOSTIC_OUTPUT",
+        "sufficiency": "SUFFICIENT (SCRIPTED)",
+        "reasoning": "The displayed facts are internally consistent with a lower urinary tract infection presentation, while the recorded negative vaginal and upper-tract features reduce key alternative concerns in this scripted demonstration."
+      },
+      "kas": 0.705218216100753,
+      "lcs": 3,
+      "dcs": 0.7789136620755648,
+      "decision": "APPROVED"
+    }
+  },
+  "demo_b": {
+    "case_id": "GU02_UTI_INCOMPLETE",
+    "label": "Demo B — Incomplete UTI Case",
+    "initial": {
+      "presentation_stage": "initial",
+      "status": "DEMO_LOADED",
+      "stage": "DEMO LOADED",
+      "main_action": "Run real pipeline",
+      "patient": {
+        "chief_complaint": "Burning pain when urinating with increased urinary frequency",
+        "symptoms": [
+          "dysuria",
+          "urinary frequency",
+          "urinary urgency",
+          "mild lower abdominal discomfort",
+          "no fever",
+          "no flank or back pain",
+          "no nausea or vomiting"
+        ],
+        "age": 27,
+        "gender": "female",
+        "duration": "2 days",
+        "medical_history": [
+          "No known chronic medical conditions.",
+          "No previous kidney disease.",
+          "No diabetes.",
+          "No known recurrent urinary tract infections."
+        ],
+        "allergies": ["None known.", "No known medication allergies."],
+        "medications": [
+          "None.",
+          "Not currently taking regular prescription or over-the-counter medication."
+        ],
+        "vaginal_discharge": "Unknown / not yet provided",
+        "explicit_negations": [],
+        "follow_up_answers": {}
+      }
+    },
+    "followup": {
+      "presentation_stage": "followup",
+      "status": "NEED_MORE_INFO",
+      "stage": "FOLLOW_UP",
+      "heading": "Additional information required",
+      "follow_up_question": "Do you currently have any unusual vaginal discharge?",
+      "main_action": "Submit Additional Information",
+      "answer_required": false,
+      "patient": {
+        "chief_complaint": "Burning pain when urinating with increased urinary frequency",
+        "symptoms": [
+          "dysuria",
+          "urinary frequency",
+          "urinary urgency",
+          "mild lower abdominal discomfort",
+          "no fever",
+          "no flank or back pain",
+          "no nausea or vomiting"
+        ],
+        "age": 27,
+        "gender": "female",
+        "duration": "2 days",
+        "medical_history": [
+          "No known chronic medical conditions.",
+          "No previous kidney disease.",
+          "No diabetes.",
+          "No known recurrent urinary tract infections."
+        ],
+        "allergies": ["None known.", "No known medication allergies."],
+        "medications": [
+          "None.",
+          "Not currently taking regular prescription or over-the-counter medication."
+        ],
+        "vaginal_discharge": "Unknown / not yet provided",
+        "explicit_negations": [],
+        "follow_up_answers": {}
+      }
+    },
+    "final": {
+      "presentation_stage": "final",
+      "status": "APPROVED",
+      "stage": "SCRIPTED FINAL",
+      "patient": {
+        "chief_complaint": "Burning pain when urinating with increased urinary frequency",
+        "symptoms": [
+          "dysuria",
+          "urinary frequency",
+          "urinary urgency",
+          "mild lower abdominal discomfort",
+          "no fever",
+          "no flank or back pain",
+          "no nausea or vomiting"
+        ],
+        "age": 27,
+        "gender": "female",
+        "duration": "2 days",
+        "medical_history": [
+          "No known chronic medical conditions.",
+          "No previous kidney disease.",
+          "No diabetes.",
+          "No known recurrent urinary tract infections."
+        ],
+        "allergies": ["None known.", "No known medication allergies."],
+        "medications": [
+          "None.",
+          "Not currently taking regular prescription or over-the-counter medication."
+        ],
+        "vaginal_discharge": "Confirmed absent",
+        "explicit_negations": ["vaginal_discharge"],
+        "follow_up_answers": {
+          "vaginal_discharge": "No unusual vaginal discharge."
+        }
+      },
+      "assessment_summary": {
+        "likely_condition": "Lower urinary tract infection (cystitis)",
+        "summary": "Scripted presentation: after vaginal discharge is confirmed absent, the displayed lower urinary symptoms and absence of fever or flank pain form a sufficient scripted presentation for a lower urinary tract infection assessment."
+      },
+      "evidence": [
+        {
+          "source": "UKHSA — UTI in women under 65 (2025)",
+          "support": "Scripted guideline-evidence presentation: dysuria and urinary frequency are relevant lower urinary symptoms, and the added absence of vaginal discharge resolves the displayed discriminator."
+        },
+        {
+          "source": "EAU — Urological Infections (2026)",
+          "support": "Scripted guideline-evidence presentation: the recorded absence of fever and flank or back pain is consistent with a lower rather than upper urinary tract presentation."
+        }
+      ],
+      "slm_a": {
+        "model": "SLM-A scripted presentation",
+        "status": "DIAGNOSTIC_OUTPUT",
+        "sufficiency": "SUFFICIENT (SCRIPTED)",
+        "reasoning": "The initial lower urinary symptoms were incomplete for presentation because vaginal discharge was unknown. Once it is scripted as confirmed absent, the displayed facts form a coherent lower urinary tract infection presentation."
+      },
+      "slm_b": {
+        "model": "SLM-B scripted presentation",
+        "status": "DIAGNOSTIC_OUTPUT",
+        "sufficiency": "SUFFICIENT (SCRIPTED)",
+        "reasoning": "The supplemental negative vaginal-discharge fact resolves the scripted missing discriminator. Dysuria, frequency, urgency, short duration, and absence of fever or flank pain remain internally consistent with a lower urinary presentation."
+      },
+      "kas": 0.6984387350589722,
+      "lcs": 3,
+      "dcs": 0.7738290512942292,
+      "decision": "APPROVED"
+    }
+  }
+}

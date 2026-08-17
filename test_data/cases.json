@@ -1,0 +1,32 @@
+[
+  {
+    "case_id": "case_001",
+    "patient_facts": {
+      "chief_complaint": "burning during urination",
+      "symptoms": ["dysuria", "frequency"],
+      "age": 28,
+      "gender": "female",
+      "duration": "2 days",
+      "explicit_negations": ["medical_history", "allergies", "medications"]
+    },
+    "expected_information_state": "SUFFICIENT",
+    "key_missing_information": [],
+    "reference_differential": ["lower urinary tract infection"],
+    "expected_evidence_topics": ["urinary symptoms", "red flags"]
+  },
+  {
+    "case_id": "case_002",
+    "patient_facts": {
+      "chief_complaint": "genital discomfort",
+      "symptoms": ["discharge"],
+      "age": 31,
+      "gender": "female",
+      "duration": "unknown",
+      "explicit_negations": ["medical_history", "allergies", "medications"]
+    },
+    "expected_information_state": "INSUFFICIENT",
+    "key_missing_information": ["associated symptoms"],
+    "reference_differential": ["vaginal infection", "sexually transmitted infection"],
+    "expected_evidence_topics": ["clinical presentation", "diagnosis"]
+  }
+]

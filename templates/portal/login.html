@@ -1,0 +1,31 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sign in — MedAI</title>
+    <link rel="stylesheet" href="{% static 'portal/app.css' %}">
+</head>
+<body>
+    <main class="auth-shell">
+        <section class="card auth-card">
+            <p class="eyebrow">MEDAI CLINICAL REASONING SYSTEM</p>
+            <h1>Sign in</h1>
+            <p class="auth-intro">Access the local evidence-grounded clinical reasoning prototype.</p>
+            <form method="post" class="auth-form">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <label for="{{ form.email.id_for_label }}">Email</label>
+                {{ form.email }}
+                {{ form.email.errors }}
+                <label for="{{ form.password.id_for_label }}">Password</label>
+                {{ form.password }}
+                {{ form.password.errors }}
+                <button type="submit">Sign in</button>
+            </form>
+            <p class="auth-link">No account? <a href="{% url 'register' %}">Register</a></p>
+        </section>
+    </main>
+</body>
+</html>

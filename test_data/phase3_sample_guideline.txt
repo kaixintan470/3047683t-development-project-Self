@@ -1,0 +1,28 @@
+Synthetic preprocessing fixture for Phase 3. This document is invented test content.
+
+Clinical Presentation
+Synthetic presentation text describes placeholder observations for software testing only.
+
+Diagnosis
+This synthetic diagnostic training sentence exists only to test deterministic chunk boundaries and carries no clinical guidance.
+This synthetic diagnostic training sentence exists only to test deterministic chunk boundaries and carries no clinical guidance.
+This synthetic diagnostic training sentence exists only to test deterministic chunk boundaries and carries no clinical guidance.
+This synthetic diagnostic training sentence exists only to test deterministic chunk boundaries and carries no clinical guidance.
+This synthetic diagnostic training sentence exists only to test deterministic chunk boundaries and carries no clinical guidance.
+This synthetic diagnostic training sentence exists only to test deterministic chunk boundaries and carries no clinical guidance.
+This synthetic diagnostic training sentence exists only to test deterministic chunk boundaries and carries no clinical guidance.
+This synthetic diagnostic training sentence exists only to test deterministic chunk boundaries and carries no clinical guidance.
+This synthetic diagnostic training sentence exists only to test deterministic chunk boundaries and carries no clinical guidance.
+This synthetic diagnostic training sentence exists only to test deterministic chunk boundaries and carries no clinical guidance.
+This synthetic diagnostic training sentence exists only to test deterministic chunk boundaries and carries no clinical guidance.
+This synthetic diagnostic training sentence exists only to test deterministic chunk boundaries and carries no clinical guidance.
+This synthetic diagnostic training sentence exists only to test deterministic chunk boundaries and carries no clinical guidance.
+This synthetic diagnostic training sentence exists only to test deterministic chunk boundaries and carries no clinical guidance.
+This synthetic diagnostic training sentence exists only to test deterministic chunk boundaries and carries no clinical guidance.
+This synthetic diagnostic training sentence exists only to test deterministic chunk boundaries and carries no clinical guidance.
+
+Differential Diagnosis
+Synthetic alternative labels appear here solely to verify section metadata preservation.
+
+Red Flags
+Synthetic alert wording appears here solely to verify recognition of the final heading.

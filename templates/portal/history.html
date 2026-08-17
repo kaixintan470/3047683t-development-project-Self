@@ -1,0 +1,44 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Assessment History — MedAI</title>
+    <link rel="stylesheet" href="{% static 'portal/app.css' %}">
+</head>
+<body>
+    <main class="shell">
+        <header class="history-header">
+            <div>
+                <p class="eyebrow">SAVED REAL ASSESSMENTS</p>
+                <h1>Assessment History</h1>
+            </div>
+            <a class="history-link" href="{% url 'app' %}">Back to Assessment</a>
+        </header>
+
+        {% if records %}
+            <section class="history-list" aria-label="Saved assessments">
+                {% for record in records %}
+                    <article class="card history-card">
+                        <p class="history-meta">Assessment — {{ record.created_at|date:"j F Y, H:i" }}</p>
+                        <h2>{{ record.likely_condition|default:"No approved condition" }}</h2>
+                        {% if record.assessment_summary %}<p class="history-summary">{{ record.assessment_summary }}</p>{% endif %}
+                        <div class="history-metrics">
+                            <div><span>DECISION</span><strong>{{ record.decision }}</strong></div>
+                            <div><span>KAS</span><strong>{% if record.kas is not None %}{{ record.kas|floatformat:2 }}{% else %}&mdash;{% endif %}</strong></div>
+                            <div><span>LCS</span><strong>{% if record.lcs is not None %}{{ record.lcs }}{% else %}&mdash;{% endif %}</strong></div>
+                            <div><span>DCS</span><strong>{% if record.dcs is not None %}{{ record.dcs|floatformat:2 }}{% else %}&mdash;{% endif %}</strong></div>
+                        </div>
+                        <a class="history-link" href="{% url 'assessment_history_detail' record.id %}">View Details</a>
+                    </article>
+                {% endfor %}
+            </section>
+        {% else %}
+            <section class="card history-empty">
+                <p>No previous assessments have been saved yet.</p>
+            </section>
+        {% endif %}
+    </main>
+</body>
+</html>

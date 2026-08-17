@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Django
+db.sqlite3
+
+# Environment / secrets
+.env
+.env.*
+
+# Logs
+*.log
+logs/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Tests / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Large local dependencies and data
+MedRAG/
+corpus/
+models/
+evaluation_results/

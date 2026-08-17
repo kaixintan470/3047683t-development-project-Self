@@ -1,0 +1,85 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Saved Assessment — MedAI</title>
+    <link rel="stylesheet" href="{% static 'portal/app.css' %}">
+</head>
+<body>
+    <main class="shell">
+        <header class="history-header">
+            <div>
+                <p class="eyebrow">SAVED REAL ASSESSMENT</p>
+                <h1>Assessment Details</h1>
+                <p class="history-meta">{{ record.created_at|date:"j F Y, H:i" }}</p>
+            </div>
+            <div>
+                <a class="history-link" href="{% url 'assessment_history' %}">Assessment History</a>
+                &nbsp;&middot;&nbsp;
+                <a class="history-link" href="{% url 'app' %}">Back to Assessment</a>
+            </div>
+        </header>
+
+        <section class="card" style="margin-bottom: 20px">
+            <p class="step">PATIENT INFORMATION</p>
+            <h2>Saved patient facts</h2>
+            <dl class="snapshot-grid">
+                {% for key, value in record.patient_snapshot.items %}
+                    {% if key != "explicit_negations" and key != "follow_up_answers" %}
+                        <dt>{{ key|title }}</dt><dd>{{ value }}</dd>
+                    {% endif %}
+                {% endfor %}
+            </dl>
+            {% if record.patient_snapshot.follow_up_answers %}
+                <h2>Saved follow-up facts</h2>
+                <dl class="snapshot-grid">
+                    {% for key, value in record.patient_snapshot.follow_up_answers.items %}
+                        <dt>{{ key|title }}</dt><dd>{{ value }}</dd>
+                    {% endfor %}
+                </dl>
+            {% endif %}
+        </section>
+
+        <section class="card assessment-card">
+            <p class="step">ASSESSMENT SUMMARY</p>
+            <h2>{{ record.likely_condition|default:"No approved condition" }}</h2>
+            {% if record.assessment_summary %}
+                <p class="history-summary">{{ record.assessment_summary }}</p>
+            {% else %}
+                <p class="history-summary">No approved assessment summary was saved for this terminal result.</p>
+            {% endif %}
+        </section>
+
+        <section class="card validation-card" style="margin-bottom: 20px">
+            <div><p class="step">VALIDATION</p><h2>Saved quality gate</h2></div>
+            <div class="metrics">
+                <div><span>KAS</span><strong>{% if record.kas is not None %}{{ record.kas|floatformat:2 }}{% else %}&mdash;{% endif %}</strong></div>
+                <div><span>LCS (0&ndash;3)</span><strong>{% if record.lcs is not None %}{{ record.lcs }}{% else %}&mdash;{% endif %}</strong></div>
+                <div><span>DCS</span><strong>{% if record.dcs is not None %}{{ record.dcs|floatformat:2 }}{% else %}&mdash;{% endif %}</strong></div>
+                <div class="decision"><span>DECISION</span><strong>{{ record.decision }}</strong></div>
+            </div>
+        </section>
+
+        <section class="grid">
+            <article class="card">
+                <p class="step">SAVED EVIDENCE</p>
+                <h2>Guideline evidence</h2>
+                {% for item in record.result_snapshot.evidence %}
+                    <div class="evidence-item">{{ item.source }}: {{ item.support }}</div>
+                {% empty %}
+                    <p class="empty">No evidence was stored for this terminal result.</p>
+                {% endfor %}
+            </article>
+            <article class="card">
+                <p class="step">SAVED MODEL TRACE</p>
+                <h2>Reasoning snapshot</h2>
+                {% if record.result_snapshot.slm_a %}<p><strong>{{ record.result_snapshot.slm_a.model }}</strong><br>{{ record.result_snapshot.slm_a.reasoning }}</p>{% endif %}
+                {% if record.result_snapshot.slm_b %}<p><strong>{{ record.result_snapshot.slm_b.model }}</strong><br>{{ record.result_snapshot.slm_b.reasoning }}</p>{% endif %}
+                {% if not record.result_snapshot.slm_a and not record.result_snapshot.slm_b %}<p class="empty">No model trace was stored for this terminal result.</p>{% endif %}
+            </article>
+        </section>
+    </main>
+</body>
+</html>
