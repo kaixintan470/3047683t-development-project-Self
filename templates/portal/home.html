@@ -58,6 +58,22 @@
             <p id="message" class="message" aria-live="polite"></p>
         </section>
 
+        <section id="mapping-card" class="card interview-card" hidden>
+            <div class="section-heading">
+                <div>
+                    <p class="step">CONCEPT CONFIRMATION</p>
+                    <h2>Which option best matches what you meant?</h2>
+                </div>
+                <span class="badge">CONFLICT</span>
+            </div>
+            <p id="mapping-original" class="input-guidance"></p>
+            <div id="mapping-candidates"></div>
+            <div class="concept-actions">
+                <button id="mapping-confirm" type="button">Confirm selected concepts</button>
+                <button id="mapping-reject" class="demo-button" type="button">None of these — reword answer</button>
+            </div>
+        </section>
+
         <section id="assessment-summary" class="card assessment-card" hidden aria-labelledby="assessment-heading">
             <p class="step">PATIENT-FACING RESULT</p>
             <h2 id="assessment-heading">Assessment Summary</h2>
@@ -112,6 +128,6 @@
             </div>
         </section>
     </main>
-    <script src="{% static 'portal/app.js' %}?v=15"></script>
+    <script src="{% static 'portal/app.js' %}?v=16"></script>
 </body>
 </html>
