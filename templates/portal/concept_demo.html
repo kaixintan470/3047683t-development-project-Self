@@ -1,0 +1,178 @@
+{% load static %}
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>患者语言标准化 Demo</title>
+    <link rel="stylesheet" href="{% static 'portal/app.css' %}">
+    <link rel="stylesheet" href="{% static 'portal/concept_demo.css' %}">
+</head>
+<body>
+<main class="concept-shell">
+    <header class="concept-hero">
+        <div>
+            <p class="eyebrow">PATIENT LANGUAGE → CLINICAL CONCEPT</p>
+            <h1>患者语言标准化 Demo</h1>
+            <p>输入患者口语，系统只做本地向量相似度匹配，返回 Top 5 候选，再由患者确认。</p>
+        </div>
+        <a class="history-link" href="{% url 'app' %}">返回主 APP</a>
+    </header>
+
+    <section class="card concept-input-card">
+        <p class="step">STEP 1 · PATIENT WORDING</p>
+        <h2>患者怎么描述自己的症状？</h2>
+        <textarea id="patient-text" rows="5" placeholder="例如：我尿尿的时候火辣辣的，而且总想上厕所。"></textarea>
+        <div class="concept-actions">
+            <button id="match-button" type="button">寻找最接近的 5 个医学概念</button>
+            <button id="example-button" class="secondary-button" type="button">填入示例</button>
+        </div>
+        <p class="input-guidance">这个 Demo 不调用 LLM，不消耗生成式 Token。匹配使用本地字符 n-gram 向量 + cosine similarity。</p>
+        <p id="status-message" class="message" aria-live="polite"></p>
+    </section>
+
+    <section id="candidate-section" class="card" hidden>
+        <p class="step">STEP 2 · TOP 5 CANDIDATES</p>
+        <div class="section-heading">
+            <div>
+                <h2>请选择最符合你原意的概念</h2>
+                <p class="input-guidance">可多选。如果都不准确，请不要勉强选择，回到上面重新描述。</p>
+            </div>
+            <span class="badge">PATIENT CONFIRMATION</span>
+        </div>
+        <div id="candidate-list" class="candidate-list"></div>
+        <div class="concept-actions">
+            <button id="confirm-button" type="button">确认所选概念</button>
+            <button id="none-button" class="secondary-button" type="button">都不是，我重新描述</button>
+        </div>
+    </section>
+
+    <section id="confirmed-section" class="card confirmed-card" hidden>
+        <p class="step">STEP 3 · VERIFIED CONCEPTS</p>
+        <h2>已确认的标准医学概念</h2>
+        <div class="trace-grid">
+            <div>
+                <span>患者原话</span>
+                <p id="confirmed-text"></p>
+            </div>
+            <div>
+                <span>Canonical concepts</span>
+                <div id="confirmed-concepts"></div>
+            </div>
+        </div>
+        <p class="input-guidance">下一步可把这里确认后的概念接入 Retrieval Query Generation，而不是再让 LLM 自由猜患者想表达什么。</p>
+    </section>
+</main>
+
+<script>
+const csrfToken = document.cookie
+    .split('; ')
+    .find(row => row.startsWith('csrftoken='))
+    ?.split('=')[1] || '{{ csrf_token }}';
+
+const patientText = document.getElementById('patient-text');
+const matchButton = document.getElementById('match-button');
+const exampleButton = document.getElementById('example-button');
+const candidateSection = document.getElementById('candidate-section');
+const candidateList = document.getElementById('candidate-list');
+const confirmButton = document.getElementById('confirm-button');
+const noneButton = document.getElementById('none-button');
+const statusMessage = document.getElementById('status-message');
+const confirmedSection = document.getElementById('confirmed-section');
+const confirmedText = document.getElementById('confirmed-text');
+const confirmedConcepts = document.getElementById('confirmed-concepts');
+
+exampleButton.addEventListener('click', () => {
+    patientText.value = '我尿尿的时候火辣辣的，而且总想上厕所。';
+    patientText.focus();
+});
+
+matchButton.addEventListener('click', async () => {
+    const text = patientText.value.trim();
+    if (!text) {
+        statusMessage.textContent = '请先输入患者的描述。';
+        return;
+    }
+    matchButton.disabled = true;
+    statusMessage.textContent = '正在进行本地相似度匹配…';
+    confirmedSection.hidden = true;
+    try {
+        const response = await fetch('{% url "concept_match_api" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify({patient_text: text}),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || '匹配失败');
+        renderCandidates(data.candidates);
+        candidateSection.hidden = false;
+        statusMessage.textContent = '已返回 Top 5 候选。';
+    } catch (error) {
+        statusMessage.textContent = error.message;
+    } finally {
+        matchButton.disabled = false;
+    }
+});
+
+function renderCandidates(candidates) {
+    candidateList.innerHTML = '';
+    candidates.forEach((item, index) => {
+        const row = document.createElement('label');
+        row.className = 'candidate-row';
+        row.innerHTML = `
+            <input type="checkbox" name="concept" value="${item.code}">
+            <div class="candidate-main">
+                <strong>${index + 1}. ${item.display_label}</strong>
+                <span>${item.canonical_term}</span>
+            </div>
+            <div class="score-block">
+                <span>Similarity</span>
+                <strong>${(item.score * 100).toFixed(1)}%</strong>
+            </div>`;
+        candidateList.appendChild(row);
+    });
+}
+
+confirmButton.addEventListener('click', async () => {
+    const codes = [...document.querySelectorAll('input[name="concept"]:checked')]
+        .map(input => input.value);
+    if (!codes.length) {
+        statusMessage.textContent = '请选择至少一个概念，或者点击“都不是”。';
+        return;
+    }
+    const text = patientText.value.trim();
+    const response = await fetch('{% url "concept_confirm_api" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+        },
+        body: JSON.stringify({patient_text: text, codes}),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+        statusMessage.textContent = data.error || '保存失败。';
+        return;
+    }
+    confirmedText.textContent = data.patient_text;
+    confirmedConcepts.innerHTML = data.selected_concepts
+        .map(item => `<span class="concept-chip">${item.display_label}<small>${item.canonical_term}</small></span>`)
+        .join('');
+    confirmedSection.hidden = false;
+    statusMessage.textContent = `确认完成，记录 ID：${data.confirmation_id}`;
+    confirmedSection.scrollIntoView({behavior: 'smooth'});
+});
+
+noneButton.addEventListener('click', () => {
+    document.querySelectorAll('input[name="concept"]:checked').forEach(input => input.checked = false);
+    candidateSection.hidden = true;
+    confirmedSection.hidden = true;
+    statusMessage.textContent = '请重新描述。系统不会强制把患者语言映射到错误概念。';
+    patientText.focus();
+});
+</script>
+</body>
+</html>
