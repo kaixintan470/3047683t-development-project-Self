@@ -1,19 +1,25 @@
-"""Lightweight state-machine logic for the /view interview mapping prototype."""
+"""State data and transitions for the fixed interview + concept mapping flow."""
 
 from __future__ import annotations
 
+from dataclasses import asdict
 from typing import Any, TypedDict
 
-from core.interview import INTERVIEW_FIELDS, INTERVIEW_QUESTIONS, NEGATIVE_ANSWERS
+from core.interview import (
+    INTERVIEW_FIELDS,
+    INTERVIEW_QUESTIONS,
+    NEGATIVE_ANSWERS,
+    update_patient_field,
+)
+from core.schemas import PatientState
 from portal.concept_demo import rank_concepts
 
 
+# For the first working version, only the two free-text symptom fields enter
+# concept confirmation. The remaining fixed questions are stored directly.
 MAPPING_FIELDS = {
     "chief_complaint",
     "symptoms",
-    "medical_history",
-    "allergies",
-    "medications",
 }
 
 
@@ -36,6 +42,7 @@ class ViewState(TypedDict):
     question_index: int
     current_field: str | None
     current_question: str | None
+    patient: dict[str, Any]
     history: list[HistoryItem]
     conflict: ConflictState | None
     complete: bool
@@ -48,10 +55,18 @@ def initial_view_state() -> ViewState:
         "question_index": 0,
         "current_field": first_field,
         "current_question": INTERVIEW_QUESTIONS[first_field],
+        "patient": asdict(PatientState()),
         "history": [],
         "conflict": None,
         "complete": False,
     }
+
+
+def _commit_patient_answer(state: ViewState, field_name: str, answer: str) -> None:
+    """Update the same PatientState structure used by the original clinical pipeline."""
+    patient = PatientState(**state.get("patient", {}))
+    update_patient_field(patient, field_name, answer)
+    state["patient"] = asdict(patient)
 
 
 def _advance(state: ViewState) -> ViewState:
@@ -74,7 +89,7 @@ def _advance(state: ViewState) -> ViewState:
 
 
 def submit_answer(state: ViewState, answer: str) -> ViewState:
-    """Store a fixed-question answer or pause in CONFLICT for concept confirmation."""
+    """Handle one answer; symptom text pauses in CONFLICT until mapping is confirmed."""
     if state["complete"]:
         raise ValueError("The interview is already complete.")
     if state["conflict"] is not None:
@@ -101,6 +116,7 @@ def submit_answer(state: ViewState, answer: str) -> ViewState:
         }
         return state
 
+    _commit_patient_answer(state, field, cleaned)
     state["history"].append(
         {
             "field": field,
@@ -113,7 +129,7 @@ def submit_answer(state: ViewState, answer: str) -> ViewState:
 
 
 def confirm_conflict(state: ViewState, codes: list[str]) -> ViewState:
-    """Resolve the current mapping conflict using only candidates shown to the patient."""
+    """Confirm one or more of the Top-K concepts, then commit the original answer."""
     conflict = state["conflict"]
     if conflict is None:
         raise ValueError("There is no concept conflict to confirm.")
@@ -128,6 +144,7 @@ def confirm_conflict(state: ViewState, codes: list[str]) -> ViewState:
         raise ValueError("A selected concept was not part of the presented candidates.")
 
     selected = [candidate_by_code[code] for code in codes]
+    _commit_patient_answer(state, conflict["field"], conflict["answer"])
     state["history"].append(
         {
             "field": conflict["field"],
@@ -140,7 +157,7 @@ def confirm_conflict(state: ViewState, codes: list[str]) -> ViewState:
 
 
 def reject_conflict(state: ViewState) -> ViewState:
-    """Clear the conflict and keep the same fixed question for re-wording."""
+    """Clear candidate mapping and stay on the same fixed question for re-wording."""
     if state["conflict"] is None:
         raise ValueError("There is no concept conflict to reject.")
     state["conflict"] = None
