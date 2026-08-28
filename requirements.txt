@@ -1,5 +1,6 @@
 Django==5.2.16
 faiss-cpu==1.15.0
+langgraph==1.2.11
 ollama==0.6.2
 pypdf==6.14.2
 torch==2.13.0
