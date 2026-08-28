@@ -1,4 +1,4 @@
-"""LangGraph state machine for the /view fixed interview prototype."""
+"""LangGraph state machine for the fixed interview + concept confirmation flow."""
 
 from __future__ import annotations
 
@@ -19,6 +19,7 @@ class ViewGraphState(TypedDict, total=False):
     question_index: int
     current_field: str | None
     current_question: str | None
+    patient: dict[str, Any]
     history: list[dict[str, Any]]
     conflict: dict[str, Any] | None
     complete: bool
@@ -30,23 +31,20 @@ class ViewGraphState(TypedDict, total=False):
 def route_event(state: ViewGraphState) -> str:
     event = state.get("event")
     if event not in {"answer", "confirm", "reject", "reset"}:
-        raise ValueError("Unknown /view event.")
+        raise ValueError("Unknown interview event.")
     return event
 
 
 def answer_node(state: ViewGraphState) -> ViewGraphState:
-    working = _persistent_state(state)
-    return submit_answer(working, state.get("answer", ""))
+    return submit_answer(_persistent_state(state), state.get("answer", ""))
 
 
 def confirm_node(state: ViewGraphState) -> ViewGraphState:
-    working = _persistent_state(state)
-    return confirm_conflict(working, state.get("codes", []))
+    return confirm_conflict(_persistent_state(state), state.get("codes", []))
 
 
 def reject_node(state: ViewGraphState) -> ViewGraphState:
-    working = _persistent_state(state)
-    return reject_conflict(working)
+    return reject_conflict(_persistent_state(state))
 
 
 def reset_node(_state: ViewGraphState) -> ViewGraphState:
@@ -54,12 +52,13 @@ def reset_node(_state: ViewGraphState) -> ViewGraphState:
 
 
 def _persistent_state(state: ViewGraphState) -> ViewGraphState:
-    """Strip transient event payload before persisting the workflow state."""
+    """Strip transient event payload before saving the workflow state."""
     return {
         "stage": state["stage"],
         "question_index": state["question_index"],
         "current_field": state.get("current_field"),
         "current_question": state.get("current_question"),
+        "patient": dict(state.get("patient", {})),
         "history": list(state.get("history", [])),
         "conflict": state.get("conflict"),
         "complete": bool(state.get("complete", False)),
