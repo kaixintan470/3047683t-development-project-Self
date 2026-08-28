@@ -1,0 +1,188 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MedAI State View</title>
+    <link rel="stylesheet" href="{% static 'portal/app.css' %}">
+</head>
+<body>
+<main class="shell">
+    <header class="hero">
+        <div class="account-bar">
+            <a class="account-link" href="{% url 'app' %}">Back to main APP</a>
+        </div>
+        <p class="eyebrow">STATE MACHINE INTERVIEW VIEW</p>
+        <h1>/view</h1>
+        <p>Fixed interview questions with explicit history and conflict states.</p>
+    </header>
+
+    <section class="card interview-card">
+        <div class="section-heading">
+            <div>
+                <p class="step">CURRENT NODE</p>
+                <h2 id="question"></h2>
+            </div>
+            <span id="stage" class="badge"></span>
+        </div>
+        <form id="view-form">
+            {% csrf_token %}
+            <label for="answer">Your answer</label>
+            <div class="answer-row">
+                <input id="answer" autocomplete="off">
+                <button id="submit-answer" type="submit">Continue</button>
+            </div>
+        </form>
+        <p id="message" class="message"></p>
+    </section>
+
+    <section id="conflict-card" class="card interview-card" hidden>
+        <p class="step">CONFLICT STATE</p>
+        <h2>Which concept best matches what you meant?</h2>
+        <p id="conflict-answer" class="input-guidance"></p>
+        <div id="candidate-list"></div>
+        <div class="concept-actions">
+            <button id="confirm-conflict" type="button">Confirm selected concepts</button>
+            <button id="reject-conflict" class="demo-button" type="button">None of these — reword answer</button>
+        </div>
+    </section>
+
+    <section class="grid">
+        <article class="card">
+            <p class="step">HISTORY STATE</p>
+            <h2>Confirmed history</h2>
+            <div id="history-list" class="empty">No confirmed answers yet.</div>
+        </article>
+        <article class="card">
+            <p class="step">RAW STATE</p>
+            <h2>Current state snapshot</h2>
+            <pre id="state-json" style="white-space:pre-wrap;font-size:.78rem;overflow:auto"></pre>
+        </article>
+    </section>
+
+    <section class="card">
+        <button id="reset-view" class="demo-button" type="button">Reset /view state</button>
+    </section>
+</main>
+
+<script>
+const initialState = {{ view_state|safe }};
+const form = document.getElementById('view-form');
+const answer = document.getElementById('answer');
+const question = document.getElementById('question');
+const stage = document.getElementById('stage');
+const message = document.getElementById('message');
+const conflictCard = document.getElementById('conflict-card');
+const conflictAnswer = document.getElementById('conflict-answer');
+const candidateList = document.getElementById('candidate-list');
+const historyList = document.getElementById('history-list');
+const stateJson = document.getElementById('state-json');
+const csrf = form.querySelector('[name=csrfmiddlewaretoken]').value;
+let state = initialState;
+
+function render(nextState) {
+    state = nextState;
+    stage.textContent = state.stage;
+    question.textContent = state.complete ? 'Interview complete' : (state.current_question || '');
+    form.hidden = state.complete || state.stage === 'CONFLICT';
+    conflictCard.hidden = state.stage !== 'CONFLICT' || !state.conflict;
+
+    if (state.conflict) {
+        conflictAnswer.textContent = `You said: “${state.conflict.answer}”`;
+        candidateList.innerHTML = '';
+        state.conflict.candidates.forEach((item, index) => {
+            const row = document.createElement('label');
+            row.className = 'candidate-row';
+            row.style.display = 'grid';
+            row.style.gridTemplateColumns = 'auto 1fr auto';
+            row.style.gap = '12px';
+            row.style.alignItems = 'center';
+            row.style.padding = '12px 0';
+            row.style.borderTop = '1px solid var(--line)';
+            row.innerHTML = `
+                <input type="checkbox" name="concept" value="${item.code}">
+                <span><strong>${index + 1}. ${item.display_label}</strong><br><small>${item.canonical_term}</small></span>
+                <strong>${(Number(item.score) * 100).toFixed(1)}%</strong>`;
+            candidateList.appendChild(row);
+        });
+    }
+
+    if (!state.history.length) {
+        historyList.className = 'empty';
+        historyList.textContent = 'No confirmed answers yet.';
+    } else {
+        historyList.className = '';
+        historyList.innerHTML = '';
+        state.history.forEach((item, index) => {
+            const row = document.createElement('div');
+            row.className = 'evidence-item';
+            const concepts = (item.concepts || []).map(c => `${c.display_label} (${c.canonical_term})`).join(', ');
+            row.innerHTML = `<strong>${index + 1}. ${item.question}</strong><br>${item.answer}${concepts ? `<br><small>Mapped: ${concepts}</small>` : ''}`;
+            historyList.appendChild(row);
+        });
+    }
+
+    stateJson.textContent = JSON.stringify(state, null, 2);
+    answer.value = '';
+    if (!form.hidden) answer.focus();
+}
+
+async function postJson(url, payload = {}) {
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrf},
+        body: JSON.stringify(payload),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Request failed');
+    return data;
+}
+
+form.addEventListener('submit', async event => {
+    event.preventDefault();
+    try {
+        message.textContent = 'Updating state…';
+        const data = await postJson('{% url "view_answer_api" %}', {answer: answer.value});
+        render(data);
+        message.textContent = data.stage === 'CONFLICT' ? 'Conflict detected: confirm the mapping before continuing.' : 'State updated.';
+    } catch (error) {
+        message.textContent = error.message;
+    }
+});
+
+document.getElementById('confirm-conflict').addEventListener('click', async () => {
+    const codes = [...document.querySelectorAll('input[name="concept"]:checked')].map(el => el.value);
+    try {
+        const data = await postJson('{% url "view_confirm_api" %}', {codes});
+        render(data);
+        message.textContent = 'Mapping confirmed and added to history.';
+    } catch (error) {
+        message.textContent = error.message;
+    }
+});
+
+document.getElementById('reject-conflict').addEventListener('click', async () => {
+    try {
+        const data = await postJson('{% url "view_reject_api" %}');
+        render(data);
+        message.textContent = 'Conflict cleared. Reword the same answer.';
+    } catch (error) {
+        message.textContent = error.message;
+    }
+});
+
+document.getElementById('reset-view').addEventListener('click', async () => {
+    try {
+        const data = await postJson('{% url "view_reset_api" %}');
+        render(data);
+        message.textContent = 'State reset.';
+    } catch (error) {
+        message.textContent = error.message;
+    }
+});
+
+render(initialState);
+</script>
+</body>
+</html>
