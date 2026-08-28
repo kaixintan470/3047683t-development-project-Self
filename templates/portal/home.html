@@ -12,6 +12,7 @@
         <header class="hero">
             <div class="account-bar">
                 <span>{{ request.user.email|default:request.user.username }}</span>
+                <a class="account-link" href="{% url 'concept_demo' %}">Concept Demo</a>
                 <a class="account-link" href="{% url 'assessment_history' %}">Assessment History</a>
                 <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
