@@ -17,6 +17,7 @@ urlpatterns = [
     ),
     path("logout/", views.logout_view, name="logout"),
     path("api/pipeline/", views.pipeline_api, name="pipeline_api"),
+    path("api/view/state/", view_views.view_state_api, name="view_state_api"),
     path("api/view/reset/", view_views.view_reset_api, name="view_reset_api"),
     path("api/view/answer/", view_views.view_answer_api, name="view_answer_api"),
     path("api/view/confirm/", view_views.view_confirm_api, name="view_confirm_api"),
