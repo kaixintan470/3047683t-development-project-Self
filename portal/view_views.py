@@ -1,4 +1,4 @@
-"""Django endpoints for the /view LangGraph interview prototype."""
+"""Django endpoints for the shared LangGraph interview state used by /app and /view."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ import json
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
 
 from portal.view_graph import run_view_event
 from portal.view_state import initial_view_state
@@ -33,6 +33,13 @@ def _save_state(request, state):
 def view_home(request):
     state = _get_state(request)
     return render(request, "portal/view.html", {"view_state": json.dumps(state)})
+
+
+@require_GET
+@login_required(login_url="login")
+def view_state_api(request):
+    """Return the same backend state consumed by both the main APP and /view."""
+    return JsonResponse(_get_state(request))
 
 
 @require_POST
