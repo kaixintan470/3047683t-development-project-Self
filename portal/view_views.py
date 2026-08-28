@@ -1,4 +1,4 @@
-"""Django endpoints for the /view state-machine interview prototype."""
+"""Django endpoints for the /view LangGraph interview prototype."""
 
 from __future__ import annotations
 
@@ -9,12 +9,8 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_POST
 
-from portal.view_state import (
-    confirm_conflict,
-    initial_view_state,
-    reject_conflict,
-    submit_answer,
-)
+from portal.view_graph import run_view_event
+from portal.view_state import initial_view_state
 
 
 SESSION_KEY = "view_state"
@@ -36,15 +32,18 @@ def _save_state(request, state):
 @login_required(login_url="login")
 def view_home(request):
     state = _get_state(request)
-    return render(request, "portal/view.html", {"view_state": state})
+    return render(request, "portal/view.html", {"view_state": json.dumps(state)})
 
 
 @require_POST
 @login_required(login_url="login")
 def view_reset_api(request):
-    state = initial_view_state()
-    _save_state(request, state)
-    return JsonResponse(state)
+    try:
+        state = run_view_event(_get_state(request), "reset")
+        _save_state(request, state)
+        return JsonResponse(state)
+    except ValueError as error:
+        return JsonResponse({"error": str(error)}, status=400)
 
 
 @require_POST
@@ -53,8 +52,7 @@ def view_answer_api(request):
     try:
         payload = json.loads(request.body or "{}")
         answer = str(payload.get("answer", ""))
-        state = _get_state(request)
-        state = submit_answer(state, answer)
+        state = run_view_event(_get_state(request), "answer", answer=answer)
         _save_state(request, state)
         return JsonResponse(state)
     except (json.JSONDecodeError, TypeError, ValueError) as error:
@@ -69,8 +67,7 @@ def view_confirm_api(request):
         codes = payload.get("codes", [])
         if not isinstance(codes, list) or not all(isinstance(code, str) for code in codes):
             raise ValueError("codes must be a list of strings.")
-        state = _get_state(request)
-        state = confirm_conflict(state, codes)
+        state = run_view_event(_get_state(request), "confirm", codes=codes)
         _save_state(request, state)
         return JsonResponse(state)
     except (json.JSONDecodeError, TypeError, ValueError) as error:
@@ -81,8 +78,7 @@ def view_confirm_api(request):
 @login_required(login_url="login")
 def view_reject_api(request):
     try:
-        state = _get_state(request)
-        state = reject_conflict(state)
+        state = run_view_event(_get_state(request), "reject")
         _save_state(request, state)
         return JsonResponse(state)
     except ValueError as error:
