@@ -1,4 +1,4 @@
-"""Persistent patient-owned snapshots and concept-confirmation demo data."""
+"""Persistent patient-owned snapshots and concept-confirmation data."""
 
 from django.conf import settings
 from django.db import models
@@ -25,12 +25,12 @@ class AssessmentRecord(models.Model):
 
 
 class MedicalConcept(models.Model):
-    """Small controlled vocabulary used by the concept-normalisation UI demo."""
+    """Canonical CHV/UMLS concept used for patient confirmation."""
 
     code = models.CharField(max_length=64, unique=True)
     canonical_term = models.CharField(max_length=255)
     display_label = models.CharField(max_length=255)
-    category = models.CharField(max_length=64, default="symptom")
+    category = models.CharField(max_length=64, default="CHV")
     aliases = models.JSONField(default=list)
 
     class Meta:
@@ -38,6 +38,35 @@ class MedicalConcept(models.Model):
 
     def __str__(self) -> str:
         return f"{self.display_label} ({self.canonical_term})"
+
+
+class MedicalTerm(models.Model):
+    """One consumer/professional term mapped to a canonical CHV/UMLS concept."""
+
+    concept = models.ForeignKey(
+        MedicalConcept,
+        on_delete=models.CASCADE,
+        related_name="terms",
+    )
+    term = models.CharField(max_length=500)
+    normalized_term = models.CharField(max_length=500, db_index=True)
+    explanation = models.TextField(blank=True, default="")
+    umls_preferred = models.BooleanField(default=False)
+    chv_preferred = models.BooleanField(default=False)
+    disparaged = models.BooleanField(default=False)
+    frequency_score = models.FloatField(null=True, blank=True)
+    context_score = models.FloatField(null=True, blank=True)
+    cui_score = models.FloatField(null=True, blank=True)
+    combo_score = models.FloatField(null=True, blank=True)
+    combo_score_no_top_words = models.FloatField(null=True, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["normalized_term", "disparaged"]),
+        ]
+
+    def __str__(self) -> str:
+        return self.term
 
 
 class ConceptConfirmation(models.Model):
