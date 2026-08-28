@@ -66,8 +66,9 @@
     </section>
 </main>
 
+{{ view_state|json_script:"initial-view-state" }}
 <script>
-const initialState = {{ view_state|safe }};
+const initialState = JSON.parse(document.getElementById('initial-view-state').textContent);
 const form = document.getElementById('view-form');
 const answer = document.getElementById('answer');
 const question = document.getElementById('question');
