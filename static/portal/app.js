@@ -10,9 +10,16 @@ function initialisePortal() {
     const demoLabel = document.querySelector("#demo-label");
     const demoNotice = document.querySelector("#demo-notice");
     const inputGuidance = document.querySelector("#input-guidance");
+    const mappingCard = document.querySelector("#mapping-card");
+    const mappingOriginal = document.querySelector("#mapping-original");
+    const mappingCandidates = document.querySelector("#mapping-candidates");
+    const mappingConfirm = document.querySelector("#mapping-confirm");
+    const mappingReject = document.querySelector("#mapping-reject");
     const optionalFields = new Set(["medical_history", "allergies", "medications"]);
+
     let currentField = "chief_complaint";
     let patientState = {};
+    let interviewState = null;
     let demoMode = null;
     let demoStage = null;
 
@@ -27,6 +34,20 @@ function initialisePortal() {
         } catch (_error) {
             throw new Error(`Server returned ${response.status} with invalid JSON.`);
         }
+    }
+
+    async function postJson(url, payload = {}) {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": form.querySelector("[name=csrfmiddlewaretoken]").value,
+            },
+            body: JSON.stringify(payload),
+        });
+        const data = await readJson(response);
+        if (!response.ok) throw new Error(data.error || "Request failed");
+        return data;
     }
 
     function updateInputGuidance() {
@@ -133,6 +154,95 @@ function initialisePortal() {
         document.querySelector("#decision").textContent = data.decision || data.status;
     }
 
+    function renderConflict(stateData) {
+        interviewState = stateData;
+        patientState = stateData.patient || patientState;
+        renderPatient(patientState);
+        stage.textContent = "CONFLICT";
+        mappingCard.hidden = false;
+        setAnswerVisible(false);
+        mappingOriginal.textContent = `You said: “${stateData.conflict.answer}”`;
+        mappingCandidates.innerHTML = "";
+        stateData.conflict.candidates.forEach(function (item, index) {
+            const row = document.createElement("label");
+            row.className = "candidate-row";
+            row.style.display = "grid";
+            row.style.gridTemplateColumns = "auto 1fr auto";
+            row.style.gap = "12px";
+            row.style.alignItems = "center";
+            row.style.padding = "12px 0";
+            row.style.borderTop = "1px solid var(--line)";
+            row.innerHTML = `
+                <input type="checkbox" name="mapping-concept" value="${item.code}">
+                <span><strong>${index + 1}. ${item.display_label}</strong><br><small>${item.canonical_term}</small></span>
+                <strong>${(Number(item.score) * 100).toFixed(1)}%</strong>`;
+            mappingCandidates.appendChild(row);
+        });
+        message.textContent = "Please confirm the medical concept before the interview continues.";
+    }
+
+    function renderInterviewState(stateData) {
+        interviewState = stateData;
+        patientState = stateData.patient || patientState;
+        renderPatient(patientState);
+        mappingCard.hidden = true;
+
+        if (stateData.stage === "CONFLICT" && stateData.conflict) {
+            renderConflict(stateData);
+            return;
+        }
+
+        if (stateData.complete) {
+            setAnswerVisible(false);
+            stage.textContent = "INTERVIEW COMPLETE";
+            question.textContent = "Interview complete. Running the clinical pipeline...";
+            runPipelineFromConfirmedState();
+            return;
+        }
+
+        currentField = stateData.current_field;
+        question.textContent = stateData.current_question;
+        stage.textContent = stateData.stage;
+        setAnswerVisible(true);
+        answer.value = "";
+        updateInputGuidance();
+        action.disabled = false;
+        action.textContent = "Continue";
+        answer.focus();
+    }
+
+    async function loadSharedInterviewState() {
+        const response = await fetch("/api/view/state/");
+        const data = await readJson(response);
+        if (!response.ok) throw new Error(data.error || "Unable to load interview state.");
+        renderInterviewState(data);
+    }
+
+    async function runPipelineFromConfirmedState() {
+        if (!interviewState?.complete) return;
+        message.textContent = "Sending the confirmed shared state to the real local pipeline...";
+        try {
+            const response = await fetch("/api/pipeline/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": form.querySelector("[name=csrfmiddlewaretoken]").value,
+                },
+                body: JSON.stringify({
+                    field: "run_loaded_case",
+                    answer: "",
+                    patient: interviewState.patient,
+                }),
+            });
+            const data = await readJson(response);
+            if (!response.ok) throw new Error(data.error || "Pipeline request failed");
+            renderPipeline(data);
+            message.textContent = data.status === "NEED_MORE_INFO" ? "Backend requested more information." : "Real backend result received.";
+        } catch (error) {
+            message.textContent = error.message;
+        }
+    }
+
     function renderPipeline(data) {
         renderOutput(data);
         if (data.status === "NEED_MORE_INFO") {
@@ -157,6 +267,7 @@ function initialisePortal() {
         demoLabel.textContent = data.label;
         demoNotice.textContent = data.notice;
         demoNotice.hidden = false;
+        mappingCard.hidden = true;
         setAnswerVisible(false);
         renderPatient(patientState);
         clearClinicalOutput();
@@ -216,23 +327,20 @@ function initialisePortal() {
         }
     }
 
-    function resetToLiveMode() {
+    async function resetToLiveMode() {
         demoMode = null;
         demoStage = null;
-        currentField = "chief_complaint";
-        patientState = {};
         demoLabel.textContent = "No demonstration case loaded.";
         demoNotice.hidden = true;
-        stage.textContent = "INTERVIEW";
-        question.textContent = "What is the main health problem you would like help with?";
-        setAnswerVisible(true);
-        answer.value = "";
-        answer.required = true;
-        action.disabled = false;
-        action.textContent = "Continue";
         clearClinicalOutput();
-        renderPatient({});
-        message.textContent = "Live assessment mode. Submissions use the canonical clinical pipeline.";
+        message.textContent = "Resetting shared interview state...";
+        try {
+            const data = await postJson("/api/view/reset/");
+            renderInterviewState(data);
+            message.textContent = "Live assessment mode. Main APP and /view now share this backend state.";
+        } catch (error) {
+            message.textContent = error.message;
+        }
     }
 
     document.querySelectorAll(".demo-button[data-demo-id]").forEach(function (button) {
@@ -242,6 +350,34 @@ function initialisePortal() {
     });
 
     document.querySelector("#live-mode-button").addEventListener("click", resetToLiveMode);
+
+    mappingConfirm.addEventListener("click", async function () {
+        const codes = [...document.querySelectorAll('input[name="mapping-concept"]:checked')].map(el => el.value);
+        if (!codes.length) {
+            message.textContent = "Select at least one concept, or choose None of these.";
+            return;
+        }
+        mappingConfirm.disabled = true;
+        try {
+            const data = await postJson("/api/view/confirm/", {codes});
+            renderInterviewState(data);
+            message.textContent = data.complete ? "Mapping confirmed. Interview complete." : "Mapping confirmed. Continuing the same backend state.";
+        } catch (error) {
+            message.textContent = error.message;
+        } finally {
+            mappingConfirm.disabled = false;
+        }
+    });
+
+    mappingReject.addEventListener("click", async function () {
+        try {
+            const data = await postJson("/api/view/reject/");
+            renderInterviewState(data);
+            message.textContent = "No mapping selected. Please reword the same answer.";
+        } catch (error) {
+            message.textContent = error.message;
+        }
+    });
 
     form.addEventListener("submit", async function (event) {
         event.preventDefault();
@@ -263,29 +399,53 @@ function initialisePortal() {
             return;
         }
 
-        message.textContent = "Sending confirmed facts to the real local pipeline...";
-        const payload = {field: currentField, answer: answer.value, patient: patientState};
+        // After the fixed interview, pipeline follow-up is still handled by the existing pipeline API.
         if (currentField === "pipeline_follow_up") {
-            payload.follow_up_answer = answer.value;
+            message.textContent = "Sending follow-up answer to the clinical pipeline...";
+            try {
+                const response = await fetch("/api/pipeline/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": form.querySelector("[name=csrfmiddlewaretoken]").value,
+                    },
+                    body: JSON.stringify({
+                        field: currentField,
+                        answer: answer.value,
+                        follow_up_answer: answer.value,
+                        patient: patientState,
+                    }),
+                });
+                const data = await readJson(response);
+                if (!response.ok) throw new Error(data.error || "Pipeline request failed");
+                renderPipeline(data);
+                message.textContent = data.status === "NEED_MORE_INFO" ? "Backend requested more information." : "Real backend result received.";
+            } catch (error) {
+                message.textContent = error.message;
+            } finally {
+                if (!answer.disabled) action.disabled = false;
+            }
+            return;
         }
+
+        message.textContent = "Updating the shared backend interview state...";
         try {
-            const response = await fetch("/api/pipeline/", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": form.querySelector("[name=csrfmiddlewaretoken]").value,
-                },
-                body: JSON.stringify(payload),
-            });
-            const data = await readJson(response);
-            if (!response.ok) throw new Error(data.error || "Pipeline request failed");
-            renderPipeline(data);
-            message.textContent = data.status === "NEED_MORE_INFO" ? "Backend requested more information." : "Real backend result received.";
+            const data = await postJson("/api/view/answer/", {answer: answer.value});
+            renderInterviewState(data);
+            if (data.stage === "CONFLICT") {
+                message.textContent = "Top 5 candidates are shown below. Confirm before continuing.";
+            } else if (!data.complete) {
+                message.textContent = "Answer confirmed in shared history. Continuing to the next fixed question.";
+            }
         } catch (error) {
             message.textContent = error.message;
         } finally {
             if (!answer.disabled) action.disabled = false;
         }
+    });
+
+    loadSharedInterviewState().catch(function (error) {
+        message.textContent = error.message;
     });
 }
 
